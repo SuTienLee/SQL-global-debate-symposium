@@ -12,3 +12,27 @@ WHERE GDS_Student.2021 = '1'
 GROUP BY School.School_State
 ORDER BY Number_of_Students DESC
 LIMIT 5;
+
+# Business Problem/Answer: 
+# This query allows GDS to understand where they should recruit students. In 2021, they had the most students from Texas, California, New York, Minnesota, and Massachusetts. 
+# GDS should continue recruiting efforts in these states. 
+
+
+### Query 2: 2020 Top States
+# Description of Query: 
+# This query answers the question “Which state sent the most students to GDS in 2020?”
+
+SELECT count(School.School_State) as "Number_of_Students", School.School_State as "State"
+FROM School
+INNER JOIN Student
+ON School.School_ID = Student.School_ID
+INNER JOIN GDS_Student
+ON Student.Student_ID = GDS_Student.Student_ID
+WHERE GDS_Student.year_2021 = '0' 
+GROUP BY School.School_State
+ORDER BY Number_of_Students DESC
+LIMIT 5; 
+
+# Business Problem/Answer: 
+# This query allows GDS to understand where they should recruit students. In 2020, they had the most students from Texas, California, New Jersey, Florida, and New York. 
+# Note, that this combination is different from 2021. GDS should prioritize the states occur in both years, i.e., Texas and California. 
