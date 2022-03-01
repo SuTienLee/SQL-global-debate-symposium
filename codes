@@ -36,3 +36,162 @@ LIMIT 5;
 # Business Problem/Answer: 
 # This query allows GDS to understand where they should recruit students. In 2020, they had the most students from Texas, California, New Jersey, Florida, and New York. 
 # Note, that this combination is different from 2021. GDS should prioritize the states occur in both years, i.e., Texas and California. 
+
+
+### Query 3: 2021 Top Schools
+# Description of Query: 
+# This query answers the question “Which school sent the most students to GDS in 2021?”
+
+SELECT count(School.School_State) as "Number_of_Students", School.School_Name as "School"
+FROM School
+INNER JOIN Student
+ON School.School_ID = Student.School_ID
+INNER JOIN GDS_Student
+ON Student.Student_ID = GDS_Student.Student_ID
+WHERE GDS_Student.year_2021 = '1' 
+GROUP BY School.School_Name
+ORDER BY Number_of_Students DESC
+LIMIT 5;
+
+# Business Problem/Answer: 
+# This query allows GDS to understand where they should recruit students. 
+# In 2021, they had the most students from Greenhill School, The Hockaday School, Westwood High School, Harrison High School, and Alief Elsik High School. 
+# GDS should continue recruiting efforts at these schools.
+
+
+### Query 4: 2020 Top Schools
+# Description of Query: 
+# This query answers the question “Which school sent the most students to GDS in 2020?”
+
+SELECT count(School.School_State) as "Number_of_Students", School.School_Name as 
+"School"
+FROM School
+INNER JOIN Student
+ON School.School_ID = Student.School_ID
+INNER JOIN GDS_Student
+ON Student.Student_ID = GDS_Student.Student_ID
+WHERE GDS_Student.year_2021 = '0' 
+GROUP BY School.School_Name
+ORDER BY Number_of_Students DESC
+LIMIT 5;
+
+# Business Problem/Answer: 
+# This query allows GDS to understand where they should recruit students. 
+# In 2020, they had the most students from Greenhill School, Science Park, Harvard-Westlake School, Westwood High School, and The Hockaday School. 
+# Note, that this combination is different from 2021. GDS should research why they had less students from Science Park and Harvard-Westlake in 2021.
+
+
+### Query 5: States and Unique Schools
+# Description of Query: 
+# This query answers the question “Which states have the most unique schools that send multiple students to the camp?”
+
+SELECT X.School_State, COUNT(distinct(X.School_Name)) AS 'Unique_Schools'
+from (
+SELECT School_Name, School_State, COUNT (Student_ID) AS 'Total'
+from Student
+LEFT JOIN School
+on Student.School_ID=School.School_ID
+GROUP BY School.School_ID
+HAVING COUNT(Student_ID)>1) AS X
+GROUP BY X.School_State
+ORDER BY Unique_Schools DESC;
+
+# Business Problem/Answer: 
+# This query allows GDS to understand where they should recruit students. 
+# They had the most unique schools from Texas, California, Florida, Massachusetts, Minnesota, New Jersey, New York, Arkansas, Colorado, Illinois, Indiana, Louisiana, Maryland, North Carolina, New Hampshire, New Mexico, Ohio, and Washington. 
+# It makes sense to reach out to schools in states that are not currently represented.
+
+
+### Query 6: Types of Classes
+# Description of Query: 
+# This query answers the question “What is the proportion between electives and core classes?”
+
+SELECT * from Course;
+SELECT CoreCurriculum_Elective AS Course, count(Course_ID) AS Occurrence FROM Course
+GROUP BY CoreCurriculum_Elective DESC;
+
+# Business Problem/Answer: 
+# This query allows gathering marketing material for GDS. GDS now has information about the elective and core split. GDS can advertise the diversity of the elective courses on their website.
+
+
+### Query 7: Ages of Campers
+# Description of Query: 
+# This query answers the question “What age is the most popular in attendance?”
+
+SELECT age, count(student_id) AS 'number_of_student' FROM
+(SELECT Student_ID, YEAR(curdate()),YEAR(curdate())-CONVERT(SUBSTRING(DOB,1,4), SIGNED INTEGER) AS age
+FROM Student
+WHERE DOB != '') AS student_age
+GROUP BY age
+ORDER BY COUNT(student_id) DESC LIMIT 1;
+
+# Business Problem/Answer: 
+# This query allows the clients to understand what age group most popularly attends GDS. The average age of the student is 17. 
+# GDS can evaluate whether they want to focus on marketing for upperclassmen (juniors and seniors) or underclassmen (likely sophomores). Recruiting younger students could lead to an increased revenue for the camp over time. 
+
+
+### Query 8: Staff Members and Courses
+# Description of Query: 
+# This query answers the question “Which staff members are teaching the most courses?”
+
+SELECT Staff.Staff_ID, Staff.First_Name, Staff.Last_Name, COUNT(Course_Staff.Course_ID) AS 'number_of_course'
+FROM Course_Staff
+LEFT JOIN Staff
+ON Course_Staff.Staff_ID=Staff.Staff_ID
+GROUP BY Staff.Staff_ID
+ORDER BY COUNT(Course_Staff.Course_ID) DESC;
+
+# Business Problem/Answer: 
+# Miha Andric, Nicholas Aranda, Michael Bole, and Emily Grantham taught the most courses. 
+# This information allows the clients to understand who should be paid more based on the number of courses they are teaching. Having this information allows the clients to cut cost. 
+
+
+### Query 9: T-Shirt Size
+# Description of Query: 
+# This query answers the question “What is the most popular shirt size?”
+
+SELECT Shirt_Size, Count(Shirt_Size) FROM Student
+GROUP BY Shirt_Size;
+
+# Business Problem/Answer: 
+# This query allows the client to understand where the camp can cut costs. 
+# If the client can understand what the most common type of t-shirt size is, they can order in bulk to reduce costs. They should order their medium t-shirts in bulk.
+
+
+### Query 10: World Schools
+# Description of Query: 
+# This query answers the question “Which states send the most students to division 2 (World Schools)?”
+
+SELECT School_State , COUNT(Student.Student_ID) AS Total, Student.Division_ID
+FROM School
+INNER JOIN Student
+ON School.School_ID = Student.School_ID
+INNER JOIN GDS_Student
+ON Student.Student_ID = GDS_Student.Student_ID
+INNER JOIN Division
+ON Student.Division_ID=Division.Division_ID
+GROUP BY School_State
+HAVING Student.Division_ID='Div102'
+ORDER BY Total DESC;
+
+# Business Problem/Answer: 
+# This query allows the clients to understand which states are prepping their members for Team USA. Team USA competes in the World Schools Debate format. 
+# This means that most of the candidates would attend the camp in the World Schools Division. 
+# These results allow the clients to prioritize recruiting students for Team USA from Minnesota, New Hampshire, Ohio, Virginia, Connecticut, and Georgia.
+
+
+### Query 11: Student Talent
+# Description of Query: 
+# This query answers the question “Which high schools have students who are National Champions, Team USA Students, or Development Team Students?”
+
+SELECT School_Name, School_State, Count(School_Name) AS Number_of_Students FROM 
+Student
+RIGHT JOIN School ON Student.School_ID = School.School_ID
+WHERE Student_ID IN (SELECT Student_ID FROM Nat_Winner) OR Student_ID IN (SELECT 
+Student_ID FROM USA_Mem) OR Student_ID IN (SELECT Student_ID FROM Dev_Mem)
+GROUP BY School_Name
+ORDER BY Number_of_Students DESC;
+
+# Business Problem/Answer: 
+# This query allows the clients to understand which high schools are producing “talent”. Talent includes producing students who are National Winners, Team USA Members, and Development Team Members. 
+# Then the client can focus their recruiting for Team USA on these schools: Alief Elsik High School and the Greenhill School.
