@@ -5,4 +5,4 @@ This SQL-based project defined the **recruitment, cost-saving, and marketing pro
 This project was contributed by MS Business Analytics and Information Management students at Purdue University:
 > Meghan Harris, Michael Jonelis, Piper Doyle, Rachel Fagan, Su-Tien Lee, Yi-Chen Chiou (In alphabetical order)
 
-In the codes file, we created ten SQL queries based on the business problem that we would like to answer.
+In the codes file, we created eleven SQL queries based on the business problem that we would like to answer.
