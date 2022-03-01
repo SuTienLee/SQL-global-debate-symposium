@@ -1,0 +1,14 @@
+### Query 1: 2021 Top States
+# Description of Query:
+# This query answers the question “Which state sent the most students to GDS in 2021?”
+
+SELECT count(School.School_State) as "Number_of_Students", School.School_State as "State"
+FROM School
+INNER JOIN Student 
+ON School.School_ID = Student.School_ID
+INNER JOIN GDS_Student 
+ON Student.Student_ID = GDS_Student.Student_ID
+WHERE GDS_Student.2021 = '1' 
+GROUP BY School.School_State
+ORDER BY Number_of_Students DESC
+LIMIT 5;
